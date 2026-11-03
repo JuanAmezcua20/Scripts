@@ -1,0 +1,23 @@
+python3 - <<'EOF'
+import json,glob,re,subprocess
+WF="NOMBRE DEL WORKFLOW"
+NODO="HTTP Request Respuesta Agente"
+for f in glob.glob('workflows/*.json'):
+    d=json.load(open(f))
+    for w in (d if isinstance(d,list) else [d]):
+        if w.get('name')!=WF: continue
+        for n in w.get('nodes',[]):
+            if n.get('name')!=NODO: continue
+            m=re.search(r'access_token=([^&"\s\\]+)',json.dumps(n))
+            tok=m.group(1) if m else None
+            if not tok:
+                for k in ('queryParameters','headerParameters'):
+                    for i in (n.get('parameters',{}).get(k) or {}).get('parameters',[]):
+                        if i.get('name') in ('access_token','Authorization'):
+                            tok=str(i.get('value')).replace('Bearer ','').strip()
+            if tok:
+                subprocess.run(['clip.exe'],input=tok.encode(),check=True)
+                print('Copiado. Largo:',len(tok),'| empieza con:',tok[:4])
+            else:
+                print('No encontré el token en ese nodo')
+EOF
