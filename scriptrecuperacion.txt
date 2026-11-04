@@ -1,7 +1,10 @@
+
+
+
 python3 - <<'EOF'
 import json,glob,re,subprocess
 WF="NOMBRE DEL WORKFLOW"
-NODO="HTTP Request Respuesta Agente"
+NODO="HTTP Request"
 for f in glob.glob('workflows/*.json'):
     d=json.load(open(f))
     for w in (d if isinstance(d,list) else [d]):
